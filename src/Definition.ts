@@ -13,10 +13,10 @@ class Definition<
       this.decls.push(decl)
    }
    
-   getResolver(ctx: Context<I,T>){
+   resolve(ctx: Context<I,T>){
       for(let i=this.decls.length-1; i>=0; i--){
          if(this.decls[i].match(ctx)){
-            return this.decls[i].getResolver(ctx)
+            return this.decls[i].resolve(ctx)
          }
       }
       throw "Matched decl not found"

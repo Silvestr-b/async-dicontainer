@@ -11,7 +11,7 @@ class Declaration<
    INTERFACES extends {[P in keyof TYPES]: INTERFACES[P]},
    TYPES extends {[P in keyof INTERFACES]: TYPES[P]},
    NAME extends keyof TYPES,
-   RESOLVEDINTERFACE extends INTERFACES[NAME] = INTERFACES[NAME],
+   RESOLVEDINTERFACE extends INTERFACES[NAME]= INTERFACES[NAME],
    REQUIREDDEPS extends RequiredDeps<INTERFACES, TYPES> = REQUIREDDEPS,
    REQUIREDDATA extends object = REQUIREDDATA,
    RESOLVEDDEPS extends ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>> {
@@ -49,17 +49,21 @@ class Declaration<
       return true
    }
 
-   getResolver(ctx: Context<INTERFACES, TYPES>) {
-      const depsResolvers = {};
+   resolve(ctx: Context<INTERFACES, TYPES>) {
+      const resolver = this.createResolver(ctx);
+
+      return resolver.resolve()
+   }
+
+   private createResolver(ctx: Context<INTERFACES, TYPES>) {
+      const depsWaiters = <any>{};
 
       for (let depName in this.deps) {
-         const depGraph = this.container.getResolver(this.deps[depName], ctx);
-         depsResolvers[<string>depName] = depGraph;
+         depsWaiters[depName] = this.container.get(this.deps[depName], ctx);
       }
 
-      return new Resolver<INTERFACES, TYPES, NAME>(depsResolvers, this.dataFetchers, this.resolver);
+      return new Resolver<INTERFACES, TYPES, NAME>(depsWaiters, this.dataFetchers, this.resolver);
    }
-  
 }
 
 

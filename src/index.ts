@@ -20,8 +20,8 @@ type Interfaces = {
    ISheep: ISheep
 }
 
-
-const loader = new DataLoader(true, true);
+const logged = true;
+const loader = new DataLoader(logged, true);
 const container = new Container<Interfaces, typeof TYPES>();
 
 
@@ -29,7 +29,7 @@ const container = new Container<Interfaces, typeof TYPES>();
 container.register(TYPES.ISheepName)
    .require('SheepName', () => loader.getAsyncSheepName())
    .resolver(deps => {
-      console.log(TYPES.ISheepName)
+      logged && console.log(TYPES.ISheepName)
       return deps.SheepName
    })
 
@@ -37,7 +37,7 @@ container.register(TYPES.ISheepName)
    .require('SheepName', () => loader.getSyncSheepName())
    .whenParent(ctx => !!ctx.parent && ctx.parent.name === TYPES.ICat)
    .resolver(deps => {
-      console.log(TYPES.ISheepName)
+      logged && console.log(TYPES.ISheepName)
       return deps.SheepName
    })
 
@@ -48,7 +48,7 @@ container.register(TYPES.ICat)
    .deps(TYPES.ISheep)
    .require('Cat', () => loader.getAsyncCat())
    .resolver(deps => {
-      console.log(TYPES.ICat)
+      logged && console.log(TYPES.ICat)
       return new deps.Cat(deps.ISheep)
    })
 
@@ -58,7 +58,7 @@ container.register(TYPES.ISheep)
    .deps(TYPES.ISheepName)
    .require('Sheep', () => loader.getAsyncSheep())
    .resolver(deps => {
-      console.log(TYPES.ISheep)
+      logged && console.log(TYPES.ISheep)
       return new deps.Sheep(deps.ISheepName)
    })
 
@@ -68,9 +68,10 @@ container.register(TYPES.IDog)
    .deps(TYPES.ICat, TYPES.ISheep)
    .require('Dog', () => loader.getAsyncDog())
    .resolver(deps => {
-      console.log(TYPES.IDog)
+      logged && console.log(TYPES.IDog)
       return new deps.Dog(deps.ICat, deps.ISheep)
    })
+   // .asSingleton()
 
 
 
@@ -89,9 +90,12 @@ container.register(TYPES.IDog)
 // });
 
 // container.get(TYPES.ICat);
-container.get(TYPES.IDog).then(instance => {
-   console.log(inspect(instance, true, 6));
-})
+container.get(TYPES.IDog).then(instance1 => {
+   console.log(inspect(instance1, true, 6));
+   // container.get(TYPES.IDog).then(instance2 => {
+   //    console.log(instance1 === instance2)
+   // })
+})   
 
 
 

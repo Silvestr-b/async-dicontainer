@@ -24,28 +24,14 @@ class Container<
       return this.createDeclarationBuilder(name)
    }
 
-   getResolver<N extends keyof T>(name: N, parentContext?: Context<I, T>) {
-      if (!this.inited) {
-         this.init()
-      }
-      const definition = this.getDefinition(name);
-      const context = new Context<I, T>(name, parentContext);
-      const resolver = definition.getResolver(context);
-
-      return resolver
-   }
-
    get<N extends keyof T>(name: N, parentContext?: Context<I, T>): Promise<I[N]> {
       if (!this.inited) {
          this.init()
       }
       const definition = this.getDefinition(name);
       const context = new Context<I, T>(name, parentContext);
-      const resolver = definition.getResolver(context);
 
-      return resolver.resolve().then(instance => {
-         return SyncPromise.resolve(instance)
-      })
+      return definition.resolve(context)
    }
 
    getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A>>>

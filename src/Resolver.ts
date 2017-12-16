@@ -18,7 +18,7 @@ class Resolver<
    RESOLVEDDEPS extends ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>> {
 
    constructor(
-      private depsResolvers: {[P in keyof REQUIREDDEPS]: Resolver<INTERFACES, TYPES, P> },
+      private depsWaiters: {[P in keyof REQUIREDDEPS]: Promise<REQUIREDDEPS[P]> },
       private dataFetchers: DataFetchers<REQUIREDDATA>,
       private resolvingCallback: (deps: ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
    ) { }
@@ -57,15 +57,14 @@ class Resolver<
       const waiters: Promise<any>[] = [];
       const resolvedDeps = <RESOLVEDDEPS>{}
 
-      for (let depName in this.depsResolvers) {
-         const depResolver = this.depsResolvers[depName];
-         const depResolveWaiter = depResolver.resolve();
+      for (let depName in this.depsWaiters) {
+         const waiter = this.depsWaiters[depName];
 
-         depResolveWaiter.then(depInstance => {
+         waiter.then(depInstance => {
             resolvedDeps[depName] = depInstance;
          });
 
-         waiters.push(depResolveWaiter);
+         waiters.push(waiter);
       }
 
       return SyncPromise.all(waiters).then(() => resolvedDeps)
