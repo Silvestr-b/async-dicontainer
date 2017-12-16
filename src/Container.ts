@@ -71,8 +71,8 @@ class Container<
 
    private init() {
       for (let i = 0; i < this.builders.length; i++) {
-         const registrator = this.builders[i];
-         const declaration = registrator.getDeclaration();
+         const builder = this.builders[i];
+         const declaration = builder.getDeclaration();
          const moduleName = declaration.getName();
          const definition = this.getDefinition(moduleName);
 
