@@ -71,7 +71,7 @@ container.register(TYPES.IDog)
       logged && console.log(TYPES.IDog)
       return new deps.Dog(deps.ICat, deps.ISheep)
    })
-   // .asSingleton()
+   .asSingleton()
 
 
 
@@ -91,10 +91,10 @@ container.register(TYPES.IDog)
 
 // container.get(TYPES.ICat);
 container.get(TYPES.IDog).then(instance1 => {
-   console.log(inspect(instance1, true, 6));
-   // container.get(TYPES.IDog).then(instance2 => {
-   //    console.log(instance1 === instance2)
-   // })
+   // console.log(inspect(instance1, true, 6));
+   container.get(TYPES.IDog).then(instance2 => {
+      console.log(instance1 === instance2)
+   })
 })   
 
 

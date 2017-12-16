@@ -50,9 +50,20 @@ class Declaration<
    }
 
    resolve(ctx: Context<INTERFACES, TYPES>) {
-      const resolver = this.createResolver(ctx);
+      return this.asSingleton
+         ? this.resolveSingleton(ctx)
+         : this.resolveInstance(ctx)
+   }
 
+   private resolveInstance(ctx: Context<INTERFACES, TYPES>) {
+      const resolver = this.createResolver(ctx);
       return resolver.resolve()
+   }
+
+   private resolveSingleton(ctx: Context<INTERFACES, TYPES>) {
+      return this.cache
+         ? this.cache
+         : this.cache = this.resolveInstance(ctx)
    }
 
    private createResolver(ctx: Context<INTERFACES, TYPES>) {
