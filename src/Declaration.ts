@@ -57,7 +57,7 @@ class Declaration<
          depsResolvers[<string>depName] = depGraph;
       }
 
-      return new Resolver(depsResolvers, this.dataFetchers, this.resolver);
+      return new Resolver<INTERFACES, TYPES, NAME>(depsResolvers, this.dataFetchers, this.resolver);
    }
   
 }
