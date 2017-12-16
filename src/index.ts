@@ -27,28 +27,28 @@ const container = new Container<Interfaces, typeof TYPES>();
 
 // ISheepName
 container.register(TYPES.ISheepName)
-   .require('SheepName', () => loader.getSyncSheepName())
+   .require('SheepName', () => loader.getAsyncSheepName())
    .resolver(deps => deps.SheepName)
 
 
 // ICat
 container.register(TYPES.ICat)
    .deps(TYPES.ISheep)
-   .require('Cat', () => loader.getSyncCat())
+   .require('Cat', () => loader.getAsyncCat())
    .resolver(deps => new deps.Cat(deps.ISheep))
 
 
 // ISheep   
 container.register(TYPES.ISheep)
    .deps(TYPES.ISheepName)
-   .require('Sheep', () => loader.getSyncSheep())
+   .require('Sheep', () => loader.getAsyncSheep())
    .resolver(deps => new deps.Sheep(deps.ISheepName))
 
 
 // IDog
 container.register(TYPES.IDog)
    .deps(TYPES.ICat, TYPES.ISheep)
-   .require('Dog', () => loader.getSyncDog())
+   .require('Dog', () => loader.getAsyncDog())
    .resolver(deps => new deps.Dog(deps.ICat, deps.ISheep)).getRDeps()
 
 
@@ -67,8 +67,11 @@ container.register(TYPES.IDog)
 //    target: ts.ScriptTarget.ES5, module: ts.ModuleKind.CommonJS
 // });
 
-container.get(TYPES.ICat);
-console.log(inspect(container.getResolvingGraph(TYPES.IDog), true, 6));
+// container.get(TYPES.ICat);
+container.get(TYPES.IDog).then(instance => {
+   console.log(inspect(instance, true, 6));
+})
+
 
 
    // let promises: Promise<any>[] = [];

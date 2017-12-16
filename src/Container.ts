@@ -22,36 +22,37 @@ class Container<
          this.definitions[name] = new Definition<I, T>()
       }
       return this.createDeclarationBuilder(name)
-   }  
-
-   getResolvingGraph<N extends keyof T>(name: N, parentContext?: Context<I,T>){
-      const definition = this.getDefinition(name);
-      const context = new Context<I,T>(name, parentContext);
-      const resolvingGraph = definition.getResolvingGraph(context);
-
-      return resolvingGraph
    }
 
-   get<N extends keyof T>(name: N, parentContext?: Context<I,T>): Promise<I[N]> {
+   getResolver<N extends keyof T>(name: N, parentContext?: Context<I, T>) {
       if (!this.inited) {
          this.init()
       }
       const definition = this.getDefinition(name);
-      const context = new Context<I,T>(name, parentContext);
-      const result = definition.resolve(context);
+      const context = new Context<I, T>(name, parentContext);
+      const resolver = definition.getResolver(context);
 
-      if(!(<Promise<I[N]>>result).then){
-         return <any>SyncPromise.resolve(result)
-      } else {
-         return result
-      } 
+      return resolver
    }
 
-   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<ResolvedDeps<I,T,RequiredDeps<I,T,A>>>
-   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B): Promise<ResolvedDeps<I,T,RequiredDeps<I,T,A,B>>>
-   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I,T,RequiredDeps<I,T,A,B,C>>>
+   get<N extends keyof T>(name: N, parentContext?: Context<I, T>): Promise<I[N]> {
+      if (!this.inited) {
+         this.init()
+      }
+      const definition = this.getDefinition(name);
+      const context = new Context<I, T>(name, parentContext);
+      const resolver = definition.getResolver(context);
+
+      return resolver.resolve().then(instance => {
+         return SyncPromise.resolve(instance)
+      })
+   }
+
+   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A>>>
+   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B>>>
+   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B, C>>>
    getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b?: B, c?: C): any {
-      
+
       const modulesNames = <Array<any>>Array.prototype.slice.call(arguments);
       const promises: Promise<any>[] = modulesNames.map(moduleName => this.get(moduleName));
 
@@ -59,10 +60,10 @@ class Container<
          const result = {};
          deps.forEach((dep, i) => result[modulesNames[i]] = dep)
          return result
-      }) 
+      })
    }
 
-   private createDeclarationBuilder<N extends keyof T>(name: N){
+   private createDeclarationBuilder<N extends keyof T>(name: N) {
       const declarationBuilder = new DeclarationBuilder<I, T, N>(this, name);
       this.builders.push(declarationBuilder);
       return declarationBuilder
@@ -81,7 +82,7 @@ class Container<
    }
 
    private getDefinition(name: keyof T) {
-      if(!this.definitions[name]){
+      if (!this.definitions[name]) {
          throw `Module is not defined: ${name}`
       }
       return this.definitions[name]
