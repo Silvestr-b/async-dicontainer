@@ -29,9 +29,6 @@ class DeclarationBuilder<
       private name: NAME
    ) { }
 
-   getRDeps(): REQUIREDDATA {
-      return <REQUIREDDATA>{}
-   }
 
    // Deps Variants
    deps<
