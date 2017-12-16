@@ -14,7 +14,7 @@ class Definition<
    }
    
    getResolver(ctx: Context<I,T>){
-      for(let i=0; i<this.decls.length; i++){
+      for(let i=this.decls.length-1; i>=0; i--){
          if(this.decls[i].match(ctx)){
             return this.decls[i].getResolver(ctx)
          }
