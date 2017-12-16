@@ -21,35 +21,56 @@ type Interfaces = {
 }
 
 
-const loader = new DataLoader();
+const loader = new DataLoader(true, true);
 const container = new Container<Interfaces, typeof TYPES>();
 
 
 // ISheepName
 container.register(TYPES.ISheepName)
    .require('SheepName', () => loader.getAsyncSheepName())
-   .resolver(deps => deps.SheepName)
+   .resolver(deps => {
+      console.log(TYPES.ISheepName)
+      return deps.SheepName
+   })
+
+container.register(TYPES.ISheepName)
+   .require('SheepName', () => loader.getSyncSheepName())
+   .whenParent(ctx => !!ctx.parent && ctx.parent.name === TYPES.ICat)
+   .resolver(deps => {
+      console.log(TYPES.ISheepName)
+      return deps.SheepName
+   })
+
 
 
 // ICat
 container.register(TYPES.ICat)
    .deps(TYPES.ISheep)
    .require('Cat', () => loader.getAsyncCat())
-   .resolver(deps => new deps.Cat(deps.ISheep))
+   .resolver(deps => {
+      console.log(TYPES.ICat)
+      return new deps.Cat(deps.ISheep)
+   })
 
 
 // ISheep   
 container.register(TYPES.ISheep)
    .deps(TYPES.ISheepName)
    .require('Sheep', () => loader.getAsyncSheep())
-   .resolver(deps => new deps.Sheep(deps.ISheepName))
+   .resolver(deps => {
+      console.log(TYPES.ISheep)
+      return new deps.Sheep(deps.ISheepName)
+   })
 
 
 // IDog
 container.register(TYPES.IDog)
    .deps(TYPES.ICat, TYPES.ISheep)
    .require('Dog', () => loader.getAsyncDog())
-   .resolver(deps => new deps.Dog(deps.ICat, deps.ISheep)).getRDeps()
+   .resolver(deps => {
+      console.log(TYPES.IDog)
+      return new deps.Dog(deps.ICat, deps.ISheep)
+   })
 
 
 
