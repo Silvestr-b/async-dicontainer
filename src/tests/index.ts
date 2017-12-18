@@ -7,24 +7,31 @@ import { DataLoader } from './utils/DataLoader'
 import { Dog } from './data/entities/Dog'
 import { Cat } from './data/entities/Cat'
 import { Sheep } from './data/entities/Sheep'
-import { SyncPromise } from 'syncasync/lib/SyncPromise';
+import { SyncPromise } from 'syncasync/lib/SyncPromise'
 
 
 
 describe('DIContainer', () => {
    const loader = new DataLoader();
    let container: Container<Interfaces, typeof TYPES>;
+   let spy: sinon.SinonSpy;
+   let notCallableSpy: sinon.SinonSpy
 
    beforeEach(() => {
       container = new Container<Interfaces, typeof TYPES>();
+      spy = sinon.spy();
+      notCallableSpy = sinon.spy();
    })
 
    describe('.get', () => {
 
       it('When module is not registered, should be rejected with that exception', done => {
          container.get(TYPES.ISheepName)
-            .then(null, err => err)
-            .then(err => expect(err).to.be.instanceof(Error))
+            .then(notCallableSpy, spy)
+            .then(() => {
+               expect(spy.firstCall.args[0]).to.be.instanceof(Error)
+               expect(notCallableSpy.notCalled).to.be.true
+            })
             .then(() => done())
       })
 
@@ -33,7 +40,11 @@ describe('DIContainer', () => {
             .resolver(deps => 'FakeSheepName')
 
          container.get(TYPES.ISheepName)
-            .then(result => expect(result).to.be.equal('FakeSheepName'))
+            .then(spy, notCallableSpy)
+            .then(() => {
+               expect(spy.calledWith('FakeSheepName')).to.be.true
+               expect(notCallableSpy.notCalled).to.be.true
+            })
             .then(() => done())
       })
 
@@ -45,9 +56,11 @@ describe('DIContainer', () => {
             .resolver(deps => 'FakeString')
 
          container.get(TYPES.ISheepName, TYPES.ISomeString)
-            .then(result => {
-               expect(result.ISheepName).to.be.equal('FakeSheepName')
-               expect(result.ISomeString).to.be.equal('FakeString')
+            .then(spy, notCallableSpy)
+            .then(() => {
+               expect(spy.firstCall.args[0].ISheepName).to.be.equal('FakeSheepName')
+               expect(spy.firstCall.args[0].ISomeString).to.be.equal('FakeString')
+               expect(notCallableSpy.notCalled).to.be.true
             })
             .then(() => done())
       })
@@ -107,8 +120,6 @@ describe('DIContainer', () => {
    describe('.deps', () => {
 
       it('When dependencies for module is declared, should resolve and pass to resolver deps by name', done => {
-         const spy = sinon.spy(deps => new Sheep(deps.ISheepName))
-
          container.register(TYPES.ISomeString)
             .resolver(deps => 'FakeString')
 
@@ -120,7 +131,13 @@ describe('DIContainer', () => {
             .resolver(spy)
 
          container.get(TYPES.ISheep)
-            .then(result => expect(spy.firstCall.args[0]).to.be.eql({ ISheepName: 'FakeSheepName', ISomeString: 'FakeString' }))
+            .catch(notCallableSpy)
+            .then(() => {
+               const result = spy.firstCall.args[0]
+               expect(result.ISheepName).to.be.equal('FakeSheepName')
+               expect(result.ISomeString).to.be.equal('FakeString')
+               expect(notCallableSpy.notCalled).to.be.true
+            })
             .then(() => done())
       })
 
@@ -141,13 +158,16 @@ describe('DIContainer', () => {
             .resolver(deps => new Dog(deps.ICat, deps.ISheep))
 
          container.get(TYPES.IDog)
-            .then(result => {
+            .then(spy, notCallableSpy)
+            .then(() => {
+               const result = spy.firstCall.args[0]
                expect(result).to.be.instanceOf(Dog)
                expect(result.sheep).to.be.instanceOf(Sheep)
                expect(result.sheep.name).to.be.string
                expect(result.cat).to.be.instanceOf(Cat)
                expect(result.cat.sheep).to.be.instanceOf(Sheep)
                expect(result.cat.sheep.name).to.be.string
+               expect(notCallableSpy.notCalled).to.be.true
             })
             .then(() => done())
       })
@@ -158,8 +178,11 @@ describe('DIContainer', () => {
             .resolver(deps => 'FakeSheepName')
 
          container.get(TYPES.ISheepName)
-            .then(null, err => {
-               expect(err.message).to.be.include('NotExistedDependency')
+            .then(notCallableSpy, spy)
+            .then(() => {
+               expect(spy.firstCall.args[0]).to.be.instanceOf(Error)
+               expect(spy.firstCall.args[0].message).to.be.include('NotExistedDependency')
+               expect(notCallableSpy.notCalled).to.be.true
             })
             .then(() => done())
       })
@@ -178,7 +201,11 @@ describe('DIContainer', () => {
             .resolver(deps => new Cat(deps.ISheep))
 
          container.get(TYPES.ICat)
-            .then(null, err => expect(err).to.be.equal('FakeMessage'))
+            .then(notCallableSpy, spy)
+            .then(() => {
+               expect(spy.firstCall.args[0]).to.be.equal('FakeMessage')
+               expect(notCallableSpy.notCalled).to.be.true
+            })
             .then(() => done())
       })
 
