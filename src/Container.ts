@@ -19,7 +19,7 @@ class Container<
 
    register<N extends keyof T>(name: N) {
       if (!this.definitions[name]) {
-         this.definitions[name] = new Definition<I, T>()
+         this.definitions[name] = new Definition<I, T>(name)
       }
       return this.createDeclarationBuilder(name)
    }
@@ -31,10 +31,6 @@ class Container<
 
    // Default signature
    get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b?: B, c?: C): any {
-      if (!this.inited) {
-         this.init()
-      }
-      
       if(arguments.length > 1){
          const modulesNames = <Array<any>>Array.prototype.slice.call(arguments);
          return this.getSeveral(modulesNames)
@@ -45,6 +41,10 @@ class Container<
 
    getSingle<N extends keyof T>(name: N, parentContext?: Context<I, T>): Promise<I[N]> {
       try {
+         if (!this.inited) {
+            this.init()
+         }
+         
          const definition = this.getDefinition(name);
          const context = new Context<I, T>(name, parentContext);
 
@@ -78,6 +78,9 @@ class Container<
          const definition = this.getDefinition(moduleName);
 
          definition.addDecl(declaration)
+      }
+      for(let definition in this.definitions){
+         this.definitions[definition].init()
       }
       this.inited = true
    }

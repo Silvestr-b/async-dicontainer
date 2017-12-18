@@ -33,6 +33,10 @@ class Declaration<
       return this.name
    }
 
+   isDefault() {
+      return !this.when && !this.whenParent
+   }
+
    match(ctx: Context<INTERFACES, TYPES>) {
       if (this.when && !this.when(ctx)) {
          return false
