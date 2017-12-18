@@ -45,7 +45,7 @@ class Resolver<
 
          dataFetchWaiter.then(fetchedData => {
             requiredData[dataName] = fetchedData;
-         });
+         }).catch(err => err);
 
          waiters.push(dataFetchWaiter);
       }
