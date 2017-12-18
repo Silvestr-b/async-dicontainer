@@ -27,7 +27,7 @@ class Container<
    // Variants of overload
    get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B, C>>>
    get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B>>>
-   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<A>
+   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<I[A]>
 
    // Default signature
    get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b?: B, c?: C): any {
