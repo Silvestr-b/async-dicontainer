@@ -1,5 +1,6 @@
 
 
 export interface ISheep { 
-   type: 'Sheep' 
+   type: 'Sheep'
+   name: string 
 }

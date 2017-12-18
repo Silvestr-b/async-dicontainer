@@ -6,12 +6,9 @@ import { IDog } from '../interfaces/IDog'
 class Dog implements IDog {
    type: 'Dog' = 'Dog';
    constructor(
-      private cat: ICat,
-      private sheep: ISheep
+      public cat: ICat,
+      public sheep: ISheep
    ) { }
-   sayHi(){
-      return 'wouf'
-   }
 }
 
 
