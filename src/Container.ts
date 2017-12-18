@@ -24,7 +24,22 @@ class Container<
       return this.createDeclarationBuilder(name)
    }
 
-   get<N extends keyof T>(name: N, parentContext?: Context<I, T>): Promise<I[N]> {
+   // Variants of overload
+   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B, C>>>
+   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B>>>
+   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<A>
+
+   // Default signature
+   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b?: B, c?: C): any {
+      if(arguments.length > 1){
+         const modulesNames = <Array<any>>Array.prototype.slice.call(arguments);
+         return this.getSeveral(modulesNames)
+      }
+      
+      return this.getSingle(a)
+   }
+
+   getSingle<N extends keyof T>(name: N, parentContext?: Context<I, T>): Promise<I[N]> {
       if (!this.inited) {
          this.init()
       }
@@ -38,16 +53,11 @@ class Container<
       }
    }
 
-   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A>>>
-   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B>>>
-   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B, C>>>
-   getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b?: B, c?: C): any {
-
-      const modulesNames = <Array<any>>Array.prototype.slice.call(arguments);
-      const promises: Promise<any>[] = modulesNames.map(moduleName => this.get(moduleName));
+   private getSeveral(modulesNames: (keyof T)[]): Promise<I[keyof I]> {
+      const promises: Promise<any>[] = modulesNames.map(moduleName => this.getSingle(moduleName));
 
       return SyncPromise.all(promises).then(deps => {
-         const result = {};
+         const result = <any>{};
          deps.forEach((dep, i) => result[modulesNames[i]] = dep)
          return result
       })

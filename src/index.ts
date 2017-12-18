@@ -73,12 +73,12 @@ container.register(TYPES.IDog)
 // });
 
 // container.get(TYPES.ICat);
-container.get(TYPES.IDog).then(instance1 => {
-   console.log(inspect(instance1, true, 6));
-   container.get(TYPES.IDog).then(instance2 => {
-      console.log(instance1 === instance2)
-   })
-})   
+container.get(TYPES.IDog).then(instance => {
+   console.log(instance)
+}, err => console.log(err))   
+container.get(TYPES.IDog, TYPES.ICat).then(list => {
+   console.log(list)
+}, err => console.log(err))
 
 
 

@@ -65,7 +65,7 @@ class Declaration<
       const depsWaiters = <any>{};
 
       for (let depName in this.deps) {
-         depsWaiters[depName] = this.container.get(this.deps[depName], ctx);
+         depsWaiters[depName] = this.container.getSingle(this.deps[depName], ctx);
       }
 
       return new Resolver<INTERFACES, TYPES, NAME>(depsWaiters, this.dataFetchers, this.resolver);
