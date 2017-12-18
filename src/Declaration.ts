@@ -2,7 +2,7 @@ import { Context } from './Context'
 import { ResolvedDeps } from './ResolvedDeps'
 import { Container } from './Container'
 import { RequiredDeps } from './RequiredDeps'
-import { SyncPromise } from 'SyncAsync'
+import { SyncPromise } from 'syncasync'
 import { DataFetchers } from './DataFetchers'
 import { Resolver } from './Resolver'
 
@@ -50,20 +50,15 @@ class Declaration<
    }
 
    resolve(ctx: Context<INTERFACES, TYPES>) {
-      return this.asSingleton
-         ? this.resolveSingleton(ctx)
-         : this.resolveInstance(ctx)
+      return this.asSingleton ? this.resolveSingleton(ctx) : this.resolveInstance(ctx)
    }
 
    private resolveInstance(ctx: Context<INTERFACES, TYPES>) {
-      const resolver = this.createResolver(ctx);
-      return resolver.resolve()
+      return this.createResolver(ctx).resolve();
    }
 
    private resolveSingleton(ctx: Context<INTERFACES, TYPES>) {
-      return this.cache
-         ? this.cache
-         : this.cache = this.resolveInstance(ctx)
+      return this.cache ? this.cache : this.cache = this.resolveInstance(ctx)
    }
 
    private createResolver(ctx: Context<INTERFACES, TYPES>) {
