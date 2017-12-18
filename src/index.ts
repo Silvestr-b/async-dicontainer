@@ -3,7 +3,7 @@ import { inspect } from 'util'
 import { IDog } from './tests/data/interfaces/IDog'
 import { ICat } from './tests/data/interfaces/ICat'
 import { ISheep } from './tests/data/interfaces/ISheep'
-import { DataLoader } from './tests/data/entities/DataLoader';
+import { DataLoader } from './tests/utils/DataLoader';
 
 
 enum TYPES {
@@ -13,64 +13,47 @@ enum TYPES {
    ISheep = 'ISheep'
 }
 
-type Interfaces = {
+interface Interfaces {
    ISheepName: string
    IDog: IDog
    ICat: ICat
    ISheep: ISheep
 }
 
-const logged = true;
-const loader = new DataLoader(logged, true);
+const loader = new DataLoader();
 const container = new Container<Interfaces, typeof TYPES>();
 
 
 // ISheepName
 container.register(TYPES.ISheepName)
    .require('SheepName', () => loader.getAsyncSheepName())
-   .resolver(deps => {
-      logged && console.log(TYPES.ISheepName)
-      return deps.SheepName
-   })
+   .resolver(deps => deps.SheepName)
 
 container.register(TYPES.ISheepName)
    .require('SheepName', () => loader.getSyncSheepName())
    .whenParent(ctx => !!ctx.parent && ctx.parent.name === TYPES.ICat)
-   .resolver(deps => {
-      logged && console.log(TYPES.ISheepName)
-      return deps.SheepName
-   })
-
+   .resolver(deps => deps.SheepName)
 
 
 // ICat
 container.register(TYPES.ICat)
    .deps(TYPES.ISheep)
    .require('Cat', () => loader.getAsyncCat())
-   .resolver(deps => {
-      logged && console.log(TYPES.ICat)
-      return new deps.Cat(deps.ISheep)
-   })
+   .resolver(deps => new deps.Cat(deps.ISheep))
 
 
 // ISheep   
 container.register(TYPES.ISheep)
    .deps(TYPES.ISheepName)
    .require('Sheep', () => loader.getAsyncSheep())
-   .resolver(deps => {
-      logged && console.log(TYPES.ISheep)
-      return new deps.Sheep(deps.ISheepName)
-   })
+   .resolver(deps => new deps.Sheep(deps.ISheepName))
 
 
 // IDog
 container.register(TYPES.IDog)
    .deps(TYPES.ICat, TYPES.ISheep)
    .require('Dog', () => loader.getAsyncDog())
-   .resolver(deps => {
-      logged && console.log(TYPES.IDog)
-      return new deps.Dog(deps.ICat, deps.ISheep)
-   })
+   .resolver(deps => new deps.Dog(deps.ICat, deps.ISheep))
    .asSingleton()
 
 
@@ -91,7 +74,7 @@ container.register(TYPES.IDog)
 
 // container.get(TYPES.ICat);
 container.get(TYPES.IDog).then(instance1 => {
-   // console.log(inspect(instance1, true, 6));
+   console.log(inspect(instance1, true, 6));
    container.get(TYPES.IDog).then(instance2 => {
       console.log(instance1 === instance2)
    })
