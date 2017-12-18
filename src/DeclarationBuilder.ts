@@ -69,9 +69,13 @@ class DeclarationBuilder<
 
    // Default
    deps<_T1 extends keyof TYPES, _T2 extends keyof TYPES, _T3 extends keyof TYPES>(a: _T1, b?: _T2, c?: _T3): any {
-      this._deps = <REQUIREDDEPS>{};
       for (let i = 0; i < arguments.length; i++) {
-         this._deps[arguments[i]] = arguments[i]
+         const name = arguments[i];
+         
+         if((<any>this._dataResolvers)[name]){
+            throw new Error(`Duplicate dependency name with required data name: ${name}`)
+         } 
+         this._deps[name] = name
       }
       return this
    }
@@ -99,6 +103,12 @@ class DeclarationBuilder<
       REQUIREDDEPS,
       RequiredData<_DATANAME, _RESOLVEDDATA, REQUIREDDATA>,
       ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, RequiredData<_DATANAME, _RESOLVEDDATA, REQUIREDDATA>>> {
+      if((<any>this._dataResolvers)[name]){
+         throw new Error(`Duplicate required data name: ${name}`)
+      } 
+      if((<any>this._deps)[name]){
+         throw new Error(`Duplicate required data name with dependency name: ${name}`)
+      }   
       (<any>this._dataResolvers)[name] = cb;
       return <any>this
    }
