@@ -2,7 +2,7 @@ import { DeclarationBuilder } from './DeclarationBuilder'
 import { Definition } from './Definition'
 import { Declaration } from './Declaration'
 import { Context } from './Context'
-import { SyncPromise } from 'SyncAsync'
+import { SyncPromise } from 'syncasync'
 import { ResolvedDeps } from './ResolvedDeps'
 import { RequiredDeps } from './RequiredDeps'
 import { Resolver } from './Resolver'
@@ -28,10 +28,14 @@ class Container<
       if (!this.inited) {
          this.init()
       }
-      const definition = this.getDefinition(name);
-      const context = new Context<I, T>(name, parentContext);
+      try {
+         const definition = this.getDefinition(name);
+         const context = new Context<I, T>(name, parentContext);
 
-      return definition.resolve(context)
+         return definition.resolve(context)
+      } catch (err) {
+         return SyncPromise.reject(err)
+      }
    }
 
    getSeveral<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A>>>
@@ -69,7 +73,7 @@ class Container<
 
    private getDefinition(name: keyof T) {
       if (!this.definitions[name]) {
-         throw `Module is not defined: ${name}`
+         throw new Error(`Module is not defined: ${name}`)
       }
       return this.definitions[name]
    }
