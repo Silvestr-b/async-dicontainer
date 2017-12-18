@@ -4,8 +4,8 @@ import { ResolvedDeps } from './ResolvedDeps'
 import { Container } from './Container'
 import { DataFetchers } from './DataFetchers'
 import { Context } from './Context'
-import { SyncPromise } from 'SyncAsync';
-import { inspect } from 'util';
+import { SyncPromise } from 'syncasync'
+import { inspect } from 'util'
 
 
 class Resolver<
@@ -55,7 +55,7 @@ class Resolver<
 
    private resolveDeps() {
       const waiters: Promise<any>[] = [];
-      const resolvedDeps = <RESOLVEDDEPS>{}
+      const resolvedDeps = <RESOLVEDDEPS>{};
 
       for (let depName in this.depsWaiters) {
          const waiter = this.depsWaiters[depName];
