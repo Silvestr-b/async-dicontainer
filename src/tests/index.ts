@@ -412,6 +412,23 @@ describe('DIContainer', () => {
             .then(() => done())
       })
 
+      it('By default returned value is true', done => {
+         container.register(TYPES.ISheepName)
+            .when(() => true)
+            .resolver(deps => 'FirstDeclaration')
+
+         container.register(TYPES.ISheepName)
+            .resolver(deps => 'SecondDeclaration')
+
+         container.get(TYPES.ISheepName)
+            .then(spy, notCallableSpy)
+            .then(() => {
+               expect(spy.firstCall.args[0]).to.be.equal('SecondDeclaration')
+               expect(notCallableSpy.notCalled).to.be.true
+            })
+            .then(() => done())
+      })
+
       it('Context object should has current module name at "name" field', done => {
          const spy = sinon.spy(() => true)
 
@@ -445,6 +462,49 @@ describe('DIContainer', () => {
             .catch(notCallableSpy)
             .then(() => {
                expect(spy.firstCall.args[0].parent).to.be.equal(parentSpy.firstCall.args[0])
+               expect(notCallableSpy.notCalled).to.be.true
+            })
+            .then(() => done())
+      })
+
+   })
+
+   describe('.whenParent', () => {
+
+      it('When parent is existed, argument should be parent context object', done => {
+         const spy = sinon.spy(() => true)
+         const parentSpy = sinon.spy(() => true)
+
+         container.register(TYPES.ISheepName)
+            .whenParent(spy)
+            .resolver(deps => 'FakeSheepName')
+
+         container.register(TYPES.ISheep)
+            .when(parentSpy)
+            .deps(TYPES.ISheepName)
+            .resolver(deps => new Sheep(deps.ISheepName))
+
+         container.get(TYPES.ISheep)
+            .catch(notCallableSpy)
+            .then(() => {
+               expect(spy.firstCall.args[0]).to.be.equal(parentSpy.firstCall.args[0])
+               expect(notCallableSpy.notCalled).to.be.true
+            })
+            .then(() => done())
+      })
+
+      it('When parent is not existed, should be resolved another declaration', done => {
+         container.register(TYPES.ISheepName)
+            .resolver(deps => 'FirstDeclaration')
+
+         container.register(TYPES.ISheepName)
+            .whenParent(() => true)
+            .resolver(deps => 'SecondDeclaration')
+
+         container.get(TYPES.ISheepName)
+            .then(spy, notCallableSpy)
+            .then(() => {
+               expect(spy.firstCall.args[0]).to.be.equal('FirstDeclaration')
                expect(notCallableSpy.notCalled).to.be.true
             })
             .then(() => done())
