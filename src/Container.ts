@@ -31,6 +31,10 @@ class Container<
 
    // Default signature
    get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b?: B, c?: C): any {
+      if (!this.inited) {
+         this.init()
+      }
+      
       if(arguments.length > 1){
          const modulesNames = <Array<any>>Array.prototype.slice.call(arguments);
          return this.getSeveral(modulesNames)
@@ -40,9 +44,6 @@ class Container<
    }
 
    getSingle<N extends keyof T>(name: N, parentContext?: Context<I, T>): Promise<I[N]> {
-      if (!this.inited) {
-         this.init()
-      }
       try {
          const definition = this.getDefinition(name);
          const context = new Context<I, T>(name, parentContext);
