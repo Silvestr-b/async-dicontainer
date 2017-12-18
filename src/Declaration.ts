@@ -16,7 +16,7 @@ class Declaration<
    REQUIREDDATA extends object = REQUIREDDATA,
    RESOLVEDDEPS extends ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>> {
 
-   private cache: RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>;
+   private cache: Promise<RESOLVEDINTERFACE>;
 
    constructor(
       private container: Container<INTERFACES, TYPES>,
