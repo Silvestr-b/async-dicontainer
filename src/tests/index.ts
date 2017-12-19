@@ -3,7 +3,6 @@ import * as sinon from 'sinon'
 import { Container } from '../Container'
 import { Interfaces } from './data/interfaces/index'
 import { TYPES } from './data/types/index'
-import { DataLoader } from './utils/DataLoader'
 import { Dog } from './data/entities/Dog'
 import { Cat } from './data/entities/Cat'
 import { Sheep } from './data/entities/Sheep'
@@ -12,7 +11,6 @@ import { SyncPromise } from 'syncasync/lib/SyncPromise'
 
 
 describe('DIContainer', () => {
-   const loader = new DataLoader();
    let container: Container<Interfaces, typeof TYPES>;
    let spy: sinon.SinonSpy;
    let notCallableSpy: sinon.SinonSpy
