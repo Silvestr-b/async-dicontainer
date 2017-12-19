@@ -1,10 +1,7 @@
+import { RequiredDeps, ResolvedDeps, DataFetchers, RequiredData } from '../'
 import { Declaration } from './Declaration'
 import { Context } from './Context'
-import { ResolvedDeps } from './ResolvedDeps'
 import { Container } from './Container'
-import { RequiredDeps } from './RequiredDeps'
-import { RequiredData } from './RequiredData'
-import { DataFetchers } from './DataFetchers'
 
 
 class DeclarationBuilder<

@@ -1,9 +1,7 @@
+import { RequiredDeps, ResolvedDeps, DataFetchers } from '../'
 import { Context } from './Context'
-import { ResolvedDeps } from './ResolvedDeps'
 import { Container } from './Container'
-import { RequiredDeps } from './RequiredDeps'
 import { SyncPromise } from 'syncasync'
-import { DataFetchers } from './DataFetchers'
 import { Resolver } from './Resolver'
 
 

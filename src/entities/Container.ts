@@ -1,10 +1,9 @@
+import { SyncPromise } from 'syncasync'
+import { ResolvedDeps, RequiredDeps } from '../'
 import { DeclarationBuilder } from './DeclarationBuilder'
 import { Definition } from './Definition'
 import { Declaration } from './Declaration'
 import { Context } from './Context'
-import { SyncPromise } from 'syncasync'
-import { ResolvedDeps } from './ResolvedDeps'
-import { RequiredDeps } from './RequiredDeps'
 import { Resolver } from './Resolver'
 
 

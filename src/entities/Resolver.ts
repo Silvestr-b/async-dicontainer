@@ -1,10 +1,9 @@
-import { Declaration } from './Declaration'
-import { RequiredDeps } from './RequiredDeps'
-import { ResolvedDeps } from './ResolvedDeps'
-import { Container } from './Container'
-import { DataFetchers } from './DataFetchers'
-import { Context } from './Context'
 import { SyncPromise } from 'syncasync'
+import { RequiredDeps, ResolvedDeps, DataFetchers } from '../'
+import { Declaration } from './Declaration'
+import { Container } from './Container'
+import { Context } from './Context'
+
 import { inspect } from 'util'
 
 
