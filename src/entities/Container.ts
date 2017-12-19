@@ -14,7 +14,6 @@ class Container<
    private inited = false;
    private builders: DeclarationBuilder<I, T>[] = [];
    private definitions: { [name: string]: Definition<I, T> } = {};
-   private singletones: { [name: string]: object } = {};
 
    register<N extends keyof T>(name: N) {
       if (!this.definitions[name]) {
