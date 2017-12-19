@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import * as sinon from 'sinon'
-import { Container } from '../Container'
+import { Container } from '../'
 import { Interfaces } from './data/interfaces/index'
 import { TYPES } from './data/types/index'
 import { Dog } from './data/entities/Dog'
