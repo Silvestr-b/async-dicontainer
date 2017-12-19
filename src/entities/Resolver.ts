@@ -4,8 +4,6 @@ import { Declaration } from './Declaration'
 import { Container } from './Container'
 import { Context } from './Context'
 
-import { inspect } from 'util'
-
 
 class Resolver<
    INTERFACES extends {[P in keyof TYPES]: INTERFACES[P]},
