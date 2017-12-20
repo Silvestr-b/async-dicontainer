@@ -20,6 +20,19 @@ describe('.resolver', () => {
       notCallableSpy = sinon.spy();
    })
 
+   it('When more than one resolver is not defined, should throw exception', done => {
+      container.register(TYPES.ISheepName)
+
+      container.get(TYPES.ISheepName)
+         .then(notCallableSpy, spy)
+         .then(() => {
+            expect(spy.firstCall.args[0]).to.be.instanceof(Error)
+            expect(spy.firstCall.args[0].message).to.include('Resolver is not defined')
+            expect(notCallableSpy.notCalled).to.be.true
+         })
+         .then(() => done())
+   })
+
    it('When more than one resolver defined, should throw exception', done => {
       const registration = () => {
          container.register(TYPES.ISheepName)
