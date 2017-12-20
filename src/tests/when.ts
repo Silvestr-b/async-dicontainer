@@ -77,7 +77,7 @@ describe('.when', () => {
          .then(() => done())
    })
 
-   it('When defined several "when" callbacks, should execute all', done => {
+   it('When declared several "when" callbacks, should execute all', done => {
       const whenSpy1 = sinon.spy(() => true);
       const whenSpy2 = sinon.spy(() => true);
 
@@ -99,7 +99,7 @@ describe('.when', () => {
          .then(() => done())
    })
 
-   it('When one of defined several "when" callbacks return false, another declaration should be resolved', done => {
+   it('When one of several "when" callbacks return false, another declaration should be resolved', done => {
       container.register(TYPES.ISheepName).resolver(deps => 'DefaultSheepName')
 
       container.register(TYPES.ISheepName)
