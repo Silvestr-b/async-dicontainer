@@ -77,6 +77,45 @@ describe('.when', () => {
          .then(() => done())
    })
 
+   it('When defined several "when" callbacks, should execute all', done => {
+      const whenSpy1 = sinon.spy(() => true);
+      const whenSpy2 = sinon.spy(() => true);
+
+      container.register(TYPES.ISheepName).resolver(deps => 'DefaultSheepName')
+
+      container.register(TYPES.ISheepName)
+         .when(whenSpy1)
+         .when(whenSpy2)
+         .resolver(deps => 'SecondDeclaration')
+
+      container.get(TYPES.ISheepName)
+         .then(spy, notCallableSpy)
+         .then(() => {
+            expect(spy.firstCall.args[0]).to.be.equal('SecondDeclaration');
+            expect(whenSpy1.called).to.be.true;
+            expect(whenSpy2.called).to.be.true;
+            expect(notCallableSpy.notCalled).to.be.true;
+         })
+         .then(() => done())
+   })
+
+   it('When one of defined several "when" callbacks return false, another declaration should be resolved', done => {
+      container.register(TYPES.ISheepName).resolver(deps => 'DefaultSheepName')
+
+      container.register(TYPES.ISheepName)
+         .when(() => false)
+         .when(() => true)
+         .resolver(deps => 'SecondDeclaration')
+
+      container.get(TYPES.ISheepName)
+         .then(spy, notCallableSpy)
+         .then(() => {
+            expect(spy.firstCall.args[0]).to.be.equal('DefaultSheepName');
+            expect(notCallableSpy.notCalled).to.be.true;
+         })
+         .then(() => done())
+   })
+
    it('Context object should has current module name at "name" field', done => {
       const spy = sinon.spy(() => true)
 
