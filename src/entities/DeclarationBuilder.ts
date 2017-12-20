@@ -16,9 +16,9 @@ class DeclarationBuilder<
    private _deps: REQUIREDDEPS = <REQUIREDDEPS>{};
    private _dataResolvers: DataFetchers<REQUIREDDATA> = <DataFetchers<REQUIREDDATA>>{};
    private _asSingleton: boolean = false;
-   private _resolver: (deps: RESOLVEDDEPS) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>;
    private _when: (context: Context<INTERFACES, TYPES>) => boolean;
    private _whenParent: (parent: Context<INTERFACES, TYPES>) => boolean;
+   private _resolver: (deps: RESOLVEDDEPS) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>;
    
 
    constructor(
@@ -119,6 +119,9 @@ class DeclarationBuilder<
    }
 
    getDeclaration() {
+      if(!this._resolver){
+         throw new Error(`Resolver is not defined for module: ${this.name}`)
+      }
       return new Declaration<INTERFACES, TYPES, NAME, RESOLVEDINTERFACE, REQUIREDDEPS, REQUIREDDATA, RESOLVEDDEPS>(
          this.container,
          this.name,
