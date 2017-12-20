@@ -22,7 +22,7 @@ class Declaration<
       private deps: REQUIREDDEPS,
       private dataFetchers: DataFetchers<REQUIREDDATA>,
       private resolver: (deps: ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
-      private when: (ctx: Context<INTERFACES, TYPES>) => boolean,
+      private when: ((context: Context<INTERFACES, TYPES>) => boolean)[],
       private whenParent: (parent: Context<INTERFACES, TYPES>) => boolean,
       private asSingleton: boolean
    ) { }
@@ -32,12 +32,14 @@ class Declaration<
    }
 
    isDefault() {
-      return !this.when && !this.whenParent
+      return this.when.length <= 0 && !this.whenParent
    }
 
    match(ctx: Context<INTERFACES, TYPES>) {
-      if (this.when && !this.when(ctx)) {
-         return false
+      for(let i=0; i<this.when.length; i++){
+         if(!this.when[i](ctx)){
+            return false
+         };
       }
 
       if (this.whenParent && !ctx.parent) {

@@ -16,7 +16,7 @@ class DeclarationBuilder<
    private _deps: REQUIREDDEPS = <REQUIREDDEPS>{};
    private _dataResolvers: DataFetchers<REQUIREDDATA> = <DataFetchers<REQUIREDDATA>>{};
    private _asSingleton: boolean = false;
-   private _when: (context: Context<INTERFACES, TYPES>) => boolean;
+   private _when: ((context: Context<INTERFACES, TYPES>) => boolean)[] = [];
    private _whenParent: (parent: Context<INTERFACES, TYPES>) => boolean;
    private _resolver: (deps: RESOLVEDDEPS) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>;
    
@@ -86,7 +86,7 @@ class DeclarationBuilder<
    }
 
    when(cb: (context: Context<INTERFACES, TYPES>) => boolean) {
-      this._when = cb
+      this._when.push(cb)
       return this
    }
 
@@ -128,7 +128,7 @@ class DeclarationBuilder<
          this._deps,
          this._dataResolvers,
          this._resolver,
-         this._when || null,
+         this._when,
          this._whenParent || null,
          this._asSingleton
       )
