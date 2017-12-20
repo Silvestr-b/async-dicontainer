@@ -78,6 +78,9 @@ class DeclarationBuilder<
    }
 
    resolver(cb: (deps: RESOLVEDDEPS) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>) {
+      if(this._resolver){
+         throw new Error(`Duplicate resolver declaration for module: ${this.name}`)
+      }
       this._resolver = cb
       return this
    }
