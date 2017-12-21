@@ -14,57 +14,49 @@ class Resolver<
    REQUIREDDATA extends object = REQUIREDDATA,
    RESOLVEDDEPS extends ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>> {
 
+   private waiters: Promise<any>[] = [];
+   private resolvedDeps: RESOLVEDDEPS = <RESOLVEDDEPS>{};
+      
    constructor(
-      private depsWaiters: {[P in keyof REQUIREDDEPS]: Promise<REQUIREDDEPS[P]> },
+      private container: Container<INTERFACES,TYPES>,
+      private deps: {[P in keyof REQUIREDDEPS]: Promise<REQUIREDDEPS[P]> },
       private dataFetchers: DataFetchers<REQUIREDDATA>,
-      private resolvingCallback: (deps: ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
+      private resolver: (deps: ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
    ) { }
 
-   resolve() {
-      const requiredData = this.fetchRequiredData();
-      const deps = this.resolveDeps();
+   resolve(ctx: Context<INTERFACES, TYPES>) {
+      this.fetchDeps(ctx);
+      this.fetchData();
 
-      return SyncPromise.all([requiredData, deps]).then(results => {
-         const resolvedDeps = Object.assign({}, results[0], results[1])
-         const instance = this.resolvingCallback(resolvedDeps)
-
-         return SyncPromise.resolve(instance)
+      return SyncPromise.all(this.waiters).then(results => {
+         return this.resolver(this.resolvedDeps)
       })
    }
 
-   private fetchRequiredData() {
-      const waiters: Promise<any>[] = [];
-      const requiredData = <REQUIREDDATA>{};
-
-      for (let dataName in this.dataFetchers) {
-         const fetcher = this.dataFetchers[dataName];
-         const dataFetchWaiter = SyncPromise.resolve(fetcher());
-
-         dataFetchWaiter.then(fetchedData => {
-            requiredData[dataName] = fetchedData;
-         }).catch(err => err);
-
-         waiters.push(dataFetchWaiter);
+   private fetchDeps(ctx: Context<INTERFACES, TYPES>){
+      for (let depName in this.deps) {
+         const fetchedDep = this.container.getSingle(this.deps[depName], ctx);
+         fetchedDep.then(depInstance => {
+            this.resolvedDeps[depName] = depInstance;
+         });
+         this.waiters.push(fetchedDep);
       }
-
-      return SyncPromise.all(waiters).then(() => requiredData)
    }
 
-   private resolveDeps() {
-      const waiters: Promise<any>[] = [];
-      const resolvedDeps = <RESOLVEDDEPS>{};
+   private fetchData(){
+      for (let dataName in this.dataFetchers) {
+         const fetcher = this.dataFetchers[dataName];
+         const fetchedData = fetcher();
 
-      for (let depName in this.depsWaiters) {
-         const waiter = this.depsWaiters[depName];
-
-         waiter.then(depInstance => {
-            resolvedDeps[depName] = depInstance;
-         });
-
-         waiters.push(waiter);
+         if (SyncPromise.isPromise(fetchedData)) {
+            this.waiters.push(fetchedData);
+            (<Promise<any>>fetchedData)
+               .then(data => this.resolvedDeps[dataName] = data)
+               .catch(err => err);
+         } else {
+            this.resolvedDeps[dataName] = fetchedData
+         }
       }
-
-      return SyncPromise.all(waiters).then(() => resolvedDeps)
    }
 
 }

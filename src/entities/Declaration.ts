@@ -56,22 +56,13 @@ class Declaration<
    }
 
    private resolveInstance(ctx: Context<INTERFACES, TYPES>) {
-      return this.createResolver(ctx).resolve();
+      return new Resolver<INTERFACES, TYPES, NAME>(this.container, this.deps, this.dataFetchers, this.resolver).resolve(ctx);
    }
 
    private resolveSingleton(ctx: Context<INTERFACES, TYPES>) {
       return this.cache ? this.cache : this.cache = this.resolveInstance(ctx)
    }
 
-   private createResolver(ctx: Context<INTERFACES, TYPES>) {
-      const depsWaiters = <any>{};
-
-      for (let depName in this.deps) {
-         depsWaiters[depName] = this.container.getSingle(this.deps[depName], ctx);
-      }
-
-      return new Resolver<INTERFACES, TYPES, NAME>(depsWaiters, this.dataFetchers, this.resolver);
-   }
 }
 
 
