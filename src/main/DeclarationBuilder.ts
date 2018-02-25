@@ -5,7 +5,7 @@ import { Container } from './Container'
 
 
 class DeclarationBuilder<
-   INTERFACES extends {[P in keyof TYPES]: INTERFACES[P]},
+   INTERFACES extends {[P in keyof TYPES]: any},
    TYPES extends {[P in keyof INTERFACES]: TYPES[P]},
    NAME extends keyof TYPES = NAME,
    RESOLVEDINTERFACE extends INTERFACES[NAME] = INTERFACES[NAME],

@@ -6,7 +6,7 @@ import { Context } from './Context'
 
 
 class Resolver<
-   INTERFACES extends {[P in keyof TYPES]: INTERFACES[P]},
+   INTERFACES extends {[P in keyof TYPES]: any},
    TYPES extends {[P in keyof INTERFACES]: TYPES[P]},
    NAME extends keyof TYPES,
    RESOLVEDINTERFACE extends INTERFACES[NAME]= INTERFACES[NAME],
@@ -49,12 +49,12 @@ class Resolver<
          const fetchedData = fetcher();
 
          if (SyncPromise.isPromise(fetchedData)) {
-            this.waiters.push(fetchedData);
+            this.waiters.push(<Promise<any>>fetchedData);
             (<Promise<any>>fetchedData)
                .then(data => this.resolvedDeps[dataName] = data)
                .catch(err => err);
          } else {
-            this.resolvedDeps[dataName] = fetchedData
+            this.resolvedDeps[<any>dataName] = fetchedData
          }
       }
    }
