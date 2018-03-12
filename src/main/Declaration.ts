@@ -1,4 +1,4 @@
-import { RequiredDeps, ResolvedDeps, DataFetchers } from '../'
+import { RequiredModules, ResolvedDeps, ResourceFetchers } from '../'
 import { Context } from './Context'
 import { Container } from './Container'
 import { SyncPromise } from 'syncasync'
@@ -9,18 +9,18 @@ class Declaration<
    INTERFACES extends {[P in keyof INTERFACES]: any},
    NAME extends keyof INTERFACES,
    RESOLVEDINTERFACE extends INTERFACES[NAME]= INTERFACES[NAME],
-   REQUIREDDEPS extends RequiredDeps<INTERFACES> = REQUIREDDEPS,
-   REQUIREDDATA extends object = REQUIREDDATA,
-   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>> {
+   REQUIREDMODULES extends RequiredModules<INTERFACES> = REQUIREDMODULES,
+   REQUIREDRESOURCES extends object = REQUIREDRESOURCES,
+   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, REQUIREDMODULES, REQUIREDRESOURCES> = ResolvedDeps<INTERFACES, REQUIREDMODULES, REQUIREDRESOURCES>> {
 
    private cache?: Promise<RESOLVEDINTERFACE>;
 
    constructor(
       private container: Container<INTERFACES>,
       private name: NAME,
-      private deps: REQUIREDDEPS,
-      private dataFetchers: DataFetchers<REQUIREDDATA>,
-      private resolver: (deps: ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
+      private requiredModules: REQUIREDMODULES,
+      private resourceFetchers: ResourceFetchers<REQUIREDRESOURCES>,
+      private resolver: (deps: ResolvedDeps<INTERFACES, REQUIREDMODULES, REQUIREDRESOURCES>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
       private when: ((context: Context<INTERFACES>) => boolean)[],
       private whenParent: ((parent: Context<INTERFACES>) => boolean)[],
       private asSingleton: boolean
@@ -55,7 +55,7 @@ class Declaration<
    }
 
    private resolveInstance(ctx: Context<INTERFACES>) {
-      return new Resolver<INTERFACES, NAME>(this.container, this.deps, this.dataFetchers, this.resolver).resolve(ctx);
+      return new Resolver<INTERFACES, NAME>(this.container, this.requiredModules, this.resourceFetchers, this.resolver).resolve(ctx);
    }
 
    private resolveSingleton(ctx: Context<INTERFACES>) {

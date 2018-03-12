@@ -1,5 +1,5 @@
 import { SyncPromise } from 'syncasync'
-import { ResolvedDeps, RequiredDeps } from '../'
+import { ResolvedDeps, RequiredModules } from '../'
 import { DeclarationBuilder } from './DeclarationBuilder'
 import { Definition } from './Definition'
 import { Declaration } from './Declaration'
@@ -21,8 +21,8 @@ class Container<I extends {[P in keyof I]: I[P]}> {
    }
 
    // Variants of overload
-   get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, RequiredDeps<I, A, B, C>>>
-   get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b: B): Promise<ResolvedDeps<I, RequiredDeps<I, A, B>>>
+   get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, RequiredModules<I, A, B, C>>>
+   get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b: B): Promise<ResolvedDeps<I, RequiredModules<I, A, B>>>
    get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A): Promise<I[A]>
 
    // Default signature

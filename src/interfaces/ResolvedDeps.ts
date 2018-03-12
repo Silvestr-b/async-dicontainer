@@ -1,4 +1,4 @@
-import { RequiredDeps } from './RequiredDeps'
+import { RequiredModules } from './RequiredModules'
 
 
 export type Merged<T> = {

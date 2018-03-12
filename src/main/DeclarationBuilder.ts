@@ -1,4 +1,4 @@
-import { RequiredDeps, ResolvedDeps, DataFetchers, RequiredData } from '../'
+import { RequiredModules, ResolvedDeps, ResourceFetchers, RequiredResources } from '../'
 import { Declaration } from './Declaration'
 import { Context } from './Context'
 import { Container } from './Container'
@@ -8,12 +8,12 @@ class DeclarationBuilder<
    INTERFACES extends {[P in keyof INTERFACES]: any},
    NAME extends keyof INTERFACES = NAME,
    RESOLVEDINTERFACE extends INTERFACES[NAME] = INTERFACES[NAME],
-   REQUIREDDEPS extends RequiredDeps<INTERFACES> = REQUIREDDEPS,
-   REQUIREDDATA extends object = REQUIREDDATA,
-   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>> {
+   REQUIREDMODULES extends RequiredModules<INTERFACES> = REQUIREDMODULES,
+   REQUIREDRESOURCES extends object = REQUIREDRESOURCES,
+   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, REQUIREDMODULES, REQUIREDRESOURCES> = ResolvedDeps<INTERFACES, REQUIREDMODULES, REQUIREDRESOURCES>> {
 
-   private _deps: REQUIREDDEPS = <REQUIREDDEPS>{};
-   private _dataResolvers: DataFetchers<REQUIREDDATA> = <DataFetchers<REQUIREDDATA>>{};
+   private _requiredModules: REQUIREDMODULES = <REQUIREDMODULES>{};
+   private _resourceFethers: ResourceFetchers<REQUIREDRESOURCES> = <ResourceFetchers<REQUIREDRESOURCES>>{};
    private _asSingleton: boolean = false;
    private _when: ((context: Context<INTERFACES>) => boolean)[] = [];
    private _whenParent: ((parent: Context<INTERFACES>) => boolean)[] = [];
@@ -35,9 +35,9 @@ class DeclarationBuilder<
       INTERFACES,
       NAME,
       RESOLVEDINTERFACE,
-      RequiredDeps<INTERFACES, _T1, _T2, _T3>,
-      REQUIREDDATA,
-      ResolvedDeps<INTERFACES, RequiredDeps<INTERFACES, _T1, _T2, _T3>>>;
+      RequiredModules<INTERFACES, _T1, _T2, _T3>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1, _T2, _T3>>>;
 
    deps<
       _T1 extends keyof INTERFACES,
@@ -46,9 +46,9 @@ class DeclarationBuilder<
       INTERFACES,
       NAME,
       RESOLVEDINTERFACE,
-      RequiredDeps<INTERFACES, _T1, _T2>,
-      REQUIREDDATA,
-      ResolvedDeps<INTERFACES, RequiredDeps<INTERFACES, _T1, _T2>>>;
+      RequiredModules<INTERFACES, _T1, _T2>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1, _T2>>>;
 
    deps<
       _T1 extends keyof INTERFACES
@@ -56,19 +56,19 @@ class DeclarationBuilder<
       INTERFACES,
       NAME,
       RESOLVEDINTERFACE,
-      RequiredDeps<INTERFACES, _T1>,
-      REQUIREDDATA,
-      ResolvedDeps<INTERFACES, RequiredDeps<INTERFACES, _T1>>>;
+      RequiredModules<INTERFACES, _T1>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1>>>;
 
    // Default
    deps<_T1 extends keyof INTERFACES, _T2 extends keyof INTERFACES, _T3 extends keyof INTERFACES>(a: _T1, b?: _T2, c?: _T3): any {
       for (let i = 0; i < arguments.length; i++) {
          const name = arguments[i];
          
-         if((<any>this._dataResolvers)[name]){
+         if(this._resourceFethers[name]){
             throw new Error(`Duplicate dependency name with required data name: ${name}`)
          } 
-         this._deps[name] = name
+         this._requiredModules[name] = name
       }
       return this
    }
@@ -95,16 +95,16 @@ class DeclarationBuilder<
       INTERFACES,
       NAME,
       RESOLVEDINTERFACE,
-      REQUIREDDEPS,
-      RequiredData<_DATANAME, _RESOLVEDDATA, REQUIREDDATA>,
-      ResolvedDeps<INTERFACES, REQUIREDDEPS, RequiredData<_DATANAME, _RESOLVEDDATA, REQUIREDDATA>>> {
-      if((<any>this._dataResolvers)[name]){
+      REQUIREDMODULES,
+      RequiredResources<_DATANAME, _RESOLVEDDATA, REQUIREDRESOURCES>,
+      ResolvedDeps<INTERFACES, REQUIREDMODULES, RequiredResources<_DATANAME, _RESOLVEDDATA, REQUIREDRESOURCES>>> {
+      if((<any>this._resourceFethers)[name]){
          throw new Error(`Duplicate required data name: ${name}`)
       } 
-      if((<any>this._deps)[name]){
+      if((<any>this._requiredModules)[name]){
          throw new Error(`Duplicate required data name with dependency name: ${name}`)
       }   
-      (<any>this._dataResolvers)[name] = cb;
+      (<any>this._resourceFethers)[name] = cb;
       return <any>this
    }
 
@@ -117,11 +117,11 @@ class DeclarationBuilder<
       if(!this._resolver){
          throw new Error(`Resolver is not defined for module: ${this.name}`)
       }
-      return new Declaration<INTERFACES, NAME, RESOLVEDINTERFACE, REQUIREDDEPS, REQUIREDDATA, RESOLVEDDEPS>(
+      return new Declaration<INTERFACES, NAME, RESOLVEDINTERFACE, REQUIREDMODULES, REQUIREDRESOURCES, RESOLVEDDEPS>(
          this.container,
          this.name,
-         this._deps,
-         this._dataResolvers,
+         this._requiredModules,
+         this._resourceFethers,
          this._resolver,
          this._when,
          this._whenParent,

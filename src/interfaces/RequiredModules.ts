@@ -1,6 +1,6 @@
 
 
-export type RequiredDeps<
+export type RequiredModules<
    INTERFACES extends {[P in keyof INTERFACES]: INTERFACES[P]},
    T1 extends keyof INTERFACES = T1,
    T2 extends keyof INTERFACES = T2,

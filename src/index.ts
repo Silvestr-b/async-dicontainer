@@ -1,8 +1,8 @@
 export { Container } from './main/Container'
-export { RequiredDeps } from './interfaces/RequiredDeps'
+export { RequiredModules } from './interfaces/RequiredModules'
 export { ResolvedDeps } from './interfaces/ResolvedDeps'
-export { DataFetchers } from './interfaces/DataFetchers'
-export { RequiredData } from './interfaces/RequiredData'
+export { ResourceFetchers } from './interfaces/ResourceFetchers'
+export { RequiredResources } from './interfaces/RequiredResources'
 
 
 

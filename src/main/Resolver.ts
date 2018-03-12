@@ -1,5 +1,5 @@
 import { SyncPromise } from 'syncasync'
-import { RequiredDeps, ResolvedDeps, DataFetchers } from '../'
+import { RequiredModules, ResolvedDeps, ResourceFetchers } from '../'
 import { Declaration } from './Declaration'
 import { Container } from './Container'
 import { Context } from './Context'
@@ -9,18 +9,18 @@ class Resolver<
    INTERFACES extends {[P in keyof INTERFACES]: any},
    NAME extends keyof INTERFACES,
    RESOLVEDINTERFACE extends INTERFACES[NAME]= INTERFACES[NAME],
-   REQUIREDDEPS extends RequiredDeps<INTERFACES> = REQUIREDDEPS,
-   REQUIREDDATA extends object = REQUIREDDATA,
-   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>> {
+   REQUIREDMODULES extends RequiredModules<INTERFACES> = REQUIREDMODULES,
+   REQUIREDRESOURCES extends object = REQUIREDRESOURCES,
+   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, REQUIREDMODULES, REQUIREDRESOURCES> = ResolvedDeps<INTERFACES, REQUIREDMODULES, REQUIREDRESOURCES>> {
 
    private waiters: Promise<any>[] = [];
    private resolvedDeps: RESOLVEDDEPS = <RESOLVEDDEPS>{};
       
    constructor(
       private container: Container<INTERFACES>,
-      private deps: {[P in keyof REQUIREDDEPS]: Promise<REQUIREDDEPS[P]> },
-      private dataFetchers: DataFetchers<REQUIREDDATA>,
-      private resolver: (deps: ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
+      private requiredModules: {[P in keyof REQUIREDMODULES]: Promise<REQUIREDMODULES[P]> },
+      private resourceFetchers: ResourceFetchers<REQUIREDRESOURCES>,
+      private resolver: (deps: ResolvedDeps<INTERFACES, REQUIREDMODULES, REQUIREDRESOURCES>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
    ) { }
 
    resolve(ctx: Context<INTERFACES>) {
@@ -33,8 +33,8 @@ class Resolver<
    }
 
    private fetchDeps(ctx: Context<INTERFACES>){
-      for (let depName in this.deps) {
-         const fetchedDep = this.container.getSingle(this.deps[depName], ctx);
+      for (let depName in this.requiredModules) {
+         const fetchedDep = this.container.getSingle(this.requiredModules[depName], ctx);
          fetchedDep.then(depInstance => {
             this.resolvedDeps[depName] = depInstance;
          });
@@ -43,17 +43,17 @@ class Resolver<
    }
 
    private fetchData(){
-      for (let dataName in this.dataFetchers) {
-         const fetcher = this.dataFetchers[dataName];
-         const fetchedData = fetcher();
+      for (let resourceName in this.resourceFetchers) {
+         const fetcher = this.resourceFetchers[resourceName];
+         const fetchedResource = fetcher();
 
-         if (SyncPromise.isPromise(fetchedData)) {
-            this.waiters.push(<Promise<any>>fetchedData);
-            (<Promise<any>>fetchedData)
-               .then(data => this.resolvedDeps[dataName] = data)
+         if (SyncPromise.isPromise(fetchedResource)) {
+            this.waiters.push(<Promise<any>>fetchedResource);
+            (<Promise<any>>fetchedResource)
+               .then(data => this.resolvedDeps[resourceName] = data)
                .catch(err => err);
          } else {
-            this.resolvedDeps[<any>dataName] = fetchedData
+            this.resolvedDeps[<any>resourceName] = fetchedResource
          }
       }
    }
