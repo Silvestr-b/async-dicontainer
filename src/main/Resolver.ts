@@ -6,25 +6,24 @@ import { Context } from './Context'
 
 
 class Resolver<
-   INTERFACES extends {[P in keyof TYPES]: any},
-   TYPES extends {[P in keyof INTERFACES]: TYPES[P]},
-   NAME extends keyof TYPES,
+   INTERFACES extends {[P in keyof INTERFACES]: any},
+   NAME extends keyof INTERFACES,
    RESOLVEDINTERFACE extends INTERFACES[NAME]= INTERFACES[NAME],
-   REQUIREDDEPS extends RequiredDeps<INTERFACES, TYPES> = REQUIREDDEPS,
+   REQUIREDDEPS extends RequiredDeps<INTERFACES> = REQUIREDDEPS,
    REQUIREDDATA extends object = REQUIREDDATA,
-   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>> {
+   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>> {
 
    private waiters: Promise<any>[] = [];
    private resolvedDeps: RESOLVEDDEPS = <RESOLVEDDEPS>{};
       
    constructor(
-      private container: Container<INTERFACES,TYPES>,
+      private container: Container<INTERFACES>,
       private deps: {[P in keyof REQUIREDDEPS]: Promise<REQUIREDDEPS[P]> },
       private dataFetchers: DataFetchers<REQUIREDDATA>,
-      private resolver: (deps: ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
+      private resolver: (deps: ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
    ) { }
 
-   resolve(ctx: Context<INTERFACES, TYPES>) {
+   resolve(ctx: Context<INTERFACES>) {
       this.fetchDeps(ctx);
       this.fetchData();
 
@@ -33,7 +32,7 @@ class Resolver<
       })
    }
 
-   private fetchDeps(ctx: Context<INTERFACES, TYPES>){
+   private fetchDeps(ctx: Context<INTERFACES>){
       for (let depName in this.deps) {
          const fetchedDep = this.container.getSingle(this.deps[depName], ctx);
          fetchedDep.then(depInstance => {

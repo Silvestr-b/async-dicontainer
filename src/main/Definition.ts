@@ -3,17 +3,15 @@ import { Context } from './Context'
 import { Resolver } from './Resolver'
 
 
-class Definition<
-   I extends {[P in keyof T]: I[P]},
-   T extends {[P in keyof I]: T[P]}> {
+class Definition<I extends {[P in keyof I]: I[P]}> {
 
-   private decls: Declaration<I, T, keyof T>[] = [];
+   private decls: Declaration<I, keyof I>[] = [];
 
    constructor(
-      private name: keyof T
+      private name: keyof I
    ){}
 
-   addDecl(decl: Declaration<I, T, keyof T>) {
+   addDecl(decl: Declaration<I, keyof I>) {
       this.decls.push(decl)
    }
 
@@ -29,7 +27,7 @@ class Definition<
       }
    }
 
-   resolve(ctx: Context<I, T>) {
+   resolve(ctx: Context<I>) {
       for (let i = this.decls.length - 1; i >= 0; i--) {
          if (this.decls[i].match(ctx)) {
             return this.decls[i].resolve(ctx)

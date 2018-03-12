@@ -6,24 +6,23 @@ import { Resolver } from './Resolver'
 
 
 class Declaration<
-   INTERFACES extends {[P in keyof TYPES]: any},
-   TYPES extends {[P in keyof INTERFACES]: TYPES[P]},
-   NAME extends keyof TYPES,
+   INTERFACES extends {[P in keyof INTERFACES]: any},
+   NAME extends keyof INTERFACES,
    RESOLVEDINTERFACE extends INTERFACES[NAME]= INTERFACES[NAME],
-   REQUIREDDEPS extends RequiredDeps<INTERFACES, TYPES> = REQUIREDDEPS,
+   REQUIREDDEPS extends RequiredDeps<INTERFACES> = REQUIREDDEPS,
    REQUIREDDATA extends object = REQUIREDDATA,
-   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>> {
+   RESOLVEDDEPS extends ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA> = ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>> {
 
-   private cache: Promise<RESOLVEDINTERFACE>;
+   private cache?: Promise<RESOLVEDINTERFACE>;
 
    constructor(
-      private container: Container<INTERFACES, TYPES>,
+      private container: Container<INTERFACES>,
       private name: NAME,
       private deps: REQUIREDDEPS,
       private dataFetchers: DataFetchers<REQUIREDDATA>,
-      private resolver: (deps: ResolvedDeps<INTERFACES, TYPES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
-      private when: ((context: Context<INTERFACES, TYPES>) => boolean)[],
-      private whenParent: ((parent: Context<INTERFACES, TYPES>) => boolean)[],
+      private resolver: (deps: ResolvedDeps<INTERFACES, REQUIREDDEPS, REQUIREDDATA>) => RESOLVEDINTERFACE | Promise<RESOLVEDINTERFACE>,
+      private when: ((context: Context<INTERFACES>) => boolean)[],
+      private whenParent: ((parent: Context<INTERFACES>) => boolean)[],
       private asSingleton: boolean
    ) { }
 
@@ -35,15 +34,15 @@ class Declaration<
       return this.when.length <= 0 && this.when.length <= 0
    }
 
-   match(ctx: Context<INTERFACES, TYPES>) {
-      for(let i=0; i<this.when.length; i++){
-         if(!this.when[i](ctx)){
+   match(ctx: Context<INTERFACES>) {
+      for (let i = 0; i < this.when.length; i++) {
+         if (!this.when[i](ctx)) {
             return false
          };
       }
 
-      for(let i=0; i<this.whenParent.length; i++){
-         if(!ctx.parent || !this.whenParent[i](ctx.parent)){
+      for (let i = 0; i < this.whenParent.length; i++) {
+         if (!ctx.parent || !this.whenParent[i](ctx.parent)) {
             return false
          };
       }
@@ -51,15 +50,15 @@ class Declaration<
       return true
    }
 
-   resolve(ctx: Context<INTERFACES, TYPES>) {
+   resolve(ctx: Context<INTERFACES>) {
       return this.asSingleton ? this.resolveSingleton(ctx) : this.resolveInstance(ctx)
    }
 
-   private resolveInstance(ctx: Context<INTERFACES, TYPES>) {
-      return new Resolver<INTERFACES, TYPES, NAME>(this.container, this.deps, this.dataFetchers, this.resolver).resolve(ctx);
+   private resolveInstance(ctx: Context<INTERFACES>) {
+      return new Resolver<INTERFACES, NAME>(this.container, this.deps, this.dataFetchers, this.resolver).resolve(ctx);
    }
 
-   private resolveSingleton(ctx: Context<INTERFACES, TYPES>) {
+   private resolveSingleton(ctx: Context<INTERFACES>) {
       return this.cache ? this.cache : this.cache = this.resolveInstance(ctx)
    }
 

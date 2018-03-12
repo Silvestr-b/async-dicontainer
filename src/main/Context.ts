@@ -1,12 +1,10 @@
 
 
-class Context<
-   I extends {[P in keyof T]: I[P]},
-   T extends {[P in keyof I]: T[P]}> {
+class Context<I extends {[P in keyof I]: I[P]}> {
 
    constructor(
-      public name: keyof T,
-      public parent?: Context<I, T>
+      public name: keyof I,
+      public parent?: Context<I>
    ) { }
 
 }

@@ -10,12 +10,12 @@ import { SyncPromise } from 'syncasync/lib/SyncPromise'
 
 
 describe('.asSingleton', () => {
-   let container: Container<Interfaces, typeof TYPES>;
+   let container: Container<Interfaces>;
    let spy: sinon.SinonSpy;
    let notCallableSpy: sinon.SinonSpy
 
    beforeEach(() => {
-      container = new Container<Interfaces, typeof TYPES>();
+      container = new Container<Interfaces>();
       spy = sinon.spy();
       notCallableSpy = sinon.spy();
    })
@@ -35,7 +35,7 @@ describe('.asSingleton', () => {
          container.get(TYPES.ISheep).then(spy, notCallableSpy)
       ])
          .catch(notCallableSpy)
-         .then(() => {
+         .then((res) => {
             expect(spy.getCall(0).args[0]).to.be.equal(spy.getCall(1).args[0])
             expect(notCallableSpy.notCalled).to.be.true
          })

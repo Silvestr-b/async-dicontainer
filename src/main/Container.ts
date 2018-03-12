@@ -7,44 +7,42 @@ import { Context } from './Context'
 import { Resolver } from './Resolver'
 
 
-class Container<
-   I extends {[P in keyof T]: I[P]},
-   T extends {[P in keyof I]: T[P]}> {
+class Container<I extends {[P in keyof I]: I[P]}> {
 
    private inited = false;
-   private builders: DeclarationBuilder<I, T>[] = [];
-   private definitions: { [name: string]: Definition<I, T> } = {};
+   private builders: DeclarationBuilder<I>[] = [];
+   private definitions: { [name: string]: Definition<I> } = {};
 
-   register<N extends keyof T>(name: N) {
+   register<N extends keyof I>(name: N) {
       if (!this.definitions[name]) {
-         this.definitions[name] = new Definition<I, T>(name)
+         this.definitions[name] = new Definition<I>(name)
       }
       return this.createDeclarationBuilder(name)
    }
 
    // Variants of overload
-   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B, C>>>
-   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b: B): Promise<ResolvedDeps<I, T, RequiredDeps<I, T, A, B>>>
-   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A): Promise<I[A]>
+   get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, RequiredDeps<I, A, B, C>>>
+   get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b: B): Promise<ResolvedDeps<I, RequiredDeps<I, A, B>>>
+   get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A): Promise<I[A]>
 
    // Default signature
-   get<A extends keyof T = A, B extends keyof T = B, C extends keyof T = C>(a: A, b?: B, c?: C): any {
-      if(arguments.length > 1){
+   get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b?: B, c?: C): any {
+      if (arguments.length > 1) {
          const modulesNames = <Array<any>>Array.prototype.slice.call(arguments);
          return this.getSeveral(modulesNames)
       }
-      
+
       return this.getSingle(a)
    }
 
-   getSingle<N extends keyof T>(name: N, parentContext?: Context<I, T>): Promise<I[N]> {
+   getSingle<N extends keyof I>(name: N, parentContext?: Context<I>): Promise<I[N]> {
       try {
          if (!this.inited) {
             this.init()
          }
-         
+
          const definition = this.getDefinition(name);
-         const context = new Context<I, T>(name, parentContext);
+         const context = new Context<I>(name, parentContext);
 
          return definition.resolve(context)
       } catch (err) {
@@ -52,7 +50,7 @@ class Container<
       }
    }
 
-   private getSeveral(modulesNames: (keyof T)[]): Promise<I[keyof I]> {
+   private getSeveral(modulesNames: (keyof I)[]): Promise<I[keyof I]> {
       const promises: Promise<any>[] = modulesNames.map(moduleName => this.getSingle(moduleName));
 
       return SyncPromise.all(promises).then(deps => {
@@ -62,8 +60,8 @@ class Container<
       })
    }
 
-   private createDeclarationBuilder<N extends keyof T>(name: N) {
-      const declarationBuilder = new DeclarationBuilder<I, T, N>(this, name);
+   private createDeclarationBuilder<N extends keyof I>(name: N) {
+      const declarationBuilder = new DeclarationBuilder<I, N>(this, name);
       this.builders.push(declarationBuilder);
       return declarationBuilder
    }
@@ -77,13 +75,13 @@ class Container<
 
          definition.addDecl(declaration)
       }
-      for(let definition in this.definitions){
+      for (let definition in this.definitions) {
          this.definitions[definition].init()
       }
       this.inited = true
    }
 
-   private getDefinition(name: keyof T) {
+   private getDefinition(name: keyof I) {
       if (!this.definitions[name]) {
          throw new Error(`Module is not defined: ${name}`)
       }

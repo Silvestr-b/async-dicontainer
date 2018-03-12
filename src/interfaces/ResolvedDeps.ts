@@ -6,8 +6,7 @@ export type Merged<T> = {
 }
 
 export type ResolvedDeps<
-   INTERFACES extends {[P in keyof TYPES]: INTERFACES[P]},
-   TYPES extends {[P in keyof INTERFACES]: TYPES[P]},
+   INTERFACES extends {[P in keyof INTERFACES]: INTERFACES[P]},
    REQUIREDDEPS extends object = REQUIREDDEPS,
    REQUIREDDATA extends object = REQUIREDDATA> = Merged<{
       [P in keyof REQUIREDDEPS]: INTERFACES[P]

@@ -10,12 +10,12 @@ import { SyncPromise } from 'syncasync/lib/SyncPromise'
 
 
 describe('.resolver', () => {
-   let container: Container<Interfaces, typeof TYPES>;
+   let container: Container<Interfaces>;
    let spy: sinon.SinonSpy;
    let notCallableSpy: sinon.SinonSpy
 
    beforeEach(() => {
-      container = new Container<Interfaces, typeof TYPES>();
+      container = new Container<Interfaces>();
       spy = sinon.spy();
       notCallableSpy = sinon.spy();
    })
