@@ -5,5 +5,6 @@ export enum TYPES {
    ISheepName = 'ISheepName',
    IDog = 'IDog',
    ICat = 'ICat',
-   ISheep = 'ISheep'
+   ISheep = 'ISheep',
+   IDuck = 'IDuck'
 }

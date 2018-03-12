@@ -10,14 +10,25 @@ import { Resolver } from './Resolver'
 class Container<I extends {[P in keyof I]: I[P]}> {
 
    private inited = false;
-   private builders: DeclarationBuilder<I>[] = [];
    private definitions: { [name: string]: Definition<I> } = {};
 
-   register<N extends keyof I>(name: N) {
-      if (!this.definitions[name]) {
-         this.definitions[name] = new Definition<I>(name)
+   extend<I2 extends {[P in keyof I2]: any}>(container: Container<I2>){
+      for(let definitionName in container.definitions){
+         if(this.definitions[definitionName]) {
+            throw new Error(`Module name is registered in both extended containers: ${definitionName}`)
+         }
+         this.definitions[definitionName] = container.definitions[definitionName]
       }
-      return this.createDeclarationBuilder(name)
+      return <Container<I&I2>>this
+   }
+
+   register<N extends keyof I>(moduleName: N) {
+      const builder = this.createDeclarationBuilder(moduleName);
+      const definition = this.createDefinition(moduleName);
+
+      definition.addBuilder(builder);
+
+      return builder
    }
 
    // Variants of overload
@@ -60,37 +71,31 @@ class Container<I extends {[P in keyof I]: I[P]}> {
       })
    }
 
-   private createDeclarationBuilder<N extends keyof I>(name: N) {
-      const declarationBuilder = new DeclarationBuilder<I, N>(this, name);
-      this.builders.push(declarationBuilder);
-      return declarationBuilder
-   }
-
    private init() {
-      for (let i = 0; i < this.builders.length; i++) {
-         const builder = this.builders[i];
-         const declaration = builder.getDeclaration();
-         const moduleName = declaration.getName();
-         const definition = this.getDefinition(moduleName);
-
-         definition.addDecl(declaration)
-      }
-      for (let definition in this.definitions) {
-         this.definitions[definition].init()
+      for (let moduleName in this.definitions) {
+         this.definitions[moduleName].init()
       }
       this.inited = true
    }
 
-   private getDefinition(name: keyof I) {
-      if (!this.definitions[name]) {
-         throw new Error(`Module is not defined: ${name}`)
+   private getDefinition(moduleName: keyof I) {
+      if (!this.definitions[moduleName]) {
+         throw new Error(`Module is not defined: ${moduleName}`)
       }
-      return this.definitions[name]
+      return this.definitions[moduleName]
+   }
+
+   private createDeclarationBuilder<N extends keyof I>(moduleName: N){
+      return new DeclarationBuilder<I, N>(this, moduleName);
+   }
+
+   private createDefinition<N extends keyof I>(moduleName: N){
+      if (!this.definitions[moduleName]) {
+         this.definitions[moduleName] = new Definition<I>(moduleName);
+      }
+      return this.definitions[moduleName]
    }
 }
 
 
 export { Container }
-
-
-

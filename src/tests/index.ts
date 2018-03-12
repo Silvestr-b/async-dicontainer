@@ -7,7 +7,8 @@ describe('DIContainer', () => {
    require('./asSingleton')
    require('./when')
    require('./whenParent')
-   require('./declaration_matching')
+   require('./declarationMatching')
    require('./require')
+   require('./extend')
 })
 
