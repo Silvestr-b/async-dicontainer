@@ -51,16 +51,16 @@ class Container<I extends {[P in keyof I]: I[P]}> {
       }
    }
 
-   extend<I2 extends {[P in keyof I2]: any}>(container: Container<I2>){
-      for(let definitionName in container.definitions){
-         if(this.definitions[definitionName]) {
+   extend<I2 extends {[P in keyof I2]: any}>(container: Container<I2>): Container<I & I2> {
+      for (let definitionName in container.definitions) {
+         if (this.definitions[definitionName]) {
             throw new Error(`Module name is registered in both extended containers: ${definitionName}`)
          }
          this.definitions[definitionName] = container.definitions[definitionName]
       }
-      return <Container<I&I2>>this
+      return <Container<I & I2>>this
    }
-   
+
    private getSeveral(modulesNames: (keyof I)[]): Promise<I[keyof I]> {
       const promises: Promise<any>[] = modulesNames.map(moduleName => this.getSingle(moduleName));
 
@@ -85,11 +85,11 @@ class Container<I extends {[P in keyof I]: I[P]}> {
       return this.definitions[moduleName]
    }
 
-   private createDeclarationBuilder<N extends keyof I>(moduleName: N){
+   private createDeclarationBuilder<N extends keyof I>(moduleName: N) {
       return new DeclarationBuilder<I, N>(this, moduleName);
    }
 
-   private createDefinition<N extends keyof I>(moduleName: N){
+   private createDefinition<N extends keyof I>(moduleName: N) {
       if (!this.definitions[moduleName]) {
          this.definitions[moduleName] = new Definition<I>(moduleName);
       }
