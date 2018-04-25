@@ -30,6 +30,99 @@ class DeclarationBuilder<
    deps<
       _T1 extends keyof INTERFACES,
       _T2 extends keyof INTERFACES,
+      _T3 extends keyof INTERFACES,
+      _T4 extends keyof INTERFACES,
+      _T5 extends keyof INTERFACES,
+      _T6 extends keyof INTERFACES,
+      _T7 extends keyof INTERFACES,
+      _T8 extends keyof INTERFACES,
+      _T9 extends keyof INTERFACES
+      >(a: _T1, b: _T2, c: _T3, d: _T4, e: _T5, f: _T6, g: _T7, h: _T8, i: _T9): DeclarationBuilder<
+      INTERFACES,
+      NAME,
+      RESOLVEDINTERFACE,
+      RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9>>>;
+   
+   deps<
+      _T1 extends keyof INTERFACES,
+      _T2 extends keyof INTERFACES,
+      _T3 extends keyof INTERFACES,
+      _T4 extends keyof INTERFACES,
+      _T5 extends keyof INTERFACES,
+      _T6 extends keyof INTERFACES,
+      _T7 extends keyof INTERFACES,
+      _T8 extends keyof INTERFACES
+      >(a: _T1, b: _T2, c: _T3, d: _T4, e: _T5, f: _T6, g: _T7, h: _T8): DeclarationBuilder<
+      INTERFACES,
+      NAME,
+      RESOLVEDINTERFACE,
+      RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8>>>;
+   
+   deps<
+      _T1 extends keyof INTERFACES,
+      _T2 extends keyof INTERFACES,
+      _T3 extends keyof INTERFACES,
+      _T4 extends keyof INTERFACES,
+      _T5 extends keyof INTERFACES,
+      _T6 extends keyof INTERFACES,
+      _T7 extends keyof INTERFACES
+      >(a: _T1, b: _T2, c: _T3, d: _T4, e: _T5, f: _T6, g: _T7): DeclarationBuilder<
+      INTERFACES,
+      NAME,
+      RESOLVEDINTERFACE,
+      RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5, _T6, _T7>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5, _T6, _T7>>>;
+
+   deps<
+      _T1 extends keyof INTERFACES,
+      _T2 extends keyof INTERFACES,
+      _T3 extends keyof INTERFACES,
+      _T4 extends keyof INTERFACES,
+      _T5 extends keyof INTERFACES,
+      _T6 extends keyof INTERFACES
+      >(a: _T1, b: _T2, c: _T3, d: _T4, e: _T5, f: _T6): DeclarationBuilder<
+      INTERFACES,
+      NAME,
+      RESOLVEDINTERFACE,
+      RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5, _T6>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5, _T6>>>;
+   
+   deps<
+      _T1 extends keyof INTERFACES,
+      _T2 extends keyof INTERFACES,
+      _T3 extends keyof INTERFACES,
+      _T4 extends keyof INTERFACES,
+      _T5 extends keyof INTERFACES,
+      >(a: _T1, b: _T2, c: _T3, d: _T4, e: _T5): DeclarationBuilder<
+      INTERFACES,
+      NAME,
+      RESOLVEDINTERFACE,
+      RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1, _T2, _T3, _T4, _T5>>>;
+
+   deps<
+      _T1 extends keyof INTERFACES,
+      _T2 extends keyof INTERFACES,
+      _T3 extends keyof INTERFACES,
+      _T4 extends keyof INTERFACES
+      >(a: _T1, b: _T2, c: _T3, d: _T4): DeclarationBuilder<
+      INTERFACES,
+      NAME,
+      RESOLVEDINTERFACE,
+      RequiredModules<INTERFACES, _T1, _T2, _T3, _T4>,
+      REQUIREDRESOURCES,
+      ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1, _T2, _T3, _T4>>>;
+
+   deps<
+      _T1 extends keyof INTERFACES,
+      _T2 extends keyof INTERFACES,
       _T3 extends keyof INTERFACES
       >(a: _T1, b: _T2, c: _T3): DeclarationBuilder<
       INTERFACES,
@@ -61,7 +154,17 @@ class DeclarationBuilder<
       ResolvedDeps<INTERFACES, RequiredModules<INTERFACES, _T1>>>;
 
    // Default
-   deps<_T1 extends keyof INTERFACES, _T2 extends keyof INTERFACES, _T3 extends keyof INTERFACES>(a: _T1, b?: _T2, c?: _T3): any {
+   deps<
+      _T1 extends keyof INTERFACES,
+      _T2 extends keyof INTERFACES,
+      _T3 extends keyof INTERFACES,
+      _T4 extends keyof INTERFACES,
+      _T5 extends keyof INTERFACES,
+      _T6 extends keyof INTERFACES,
+      _T7 extends keyof INTERFACES,
+      _T8 extends keyof INTERFACES,
+      _T9 extends keyof INTERFACES
+      >(a: _T1, b?: _T2, c?: _T3, d?: _T4, e?: _T5, f?: _T6, g?: _T7, h?: _T8, i?: _T9): any {
       for (let i = 0; i < arguments.length; i++) {
          const name = arguments[i];
          
