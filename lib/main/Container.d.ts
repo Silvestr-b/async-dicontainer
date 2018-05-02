@@ -6,7 +6,7 @@ declare class Container<I extends {
 }> {
     private inited;
     private definitions;
-    register<N extends keyof I>(moduleName: N): DeclarationBuilder<I, N, I[N], {}, {}, {}>;
+    register: <N extends keyof I>(moduleName: N) => DeclarationBuilder<I, N, I[N], {}, {}, {}>;
     get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b: B, c: C): Promise<ResolvedDeps<I, RequiredModules<I, A, B, C>>>;
     get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A, b: B): Promise<ResolvedDeps<I, RequiredModules<I, A, B>>>;
     get<A extends keyof I = A, B extends keyof I = B, C extends keyof I = C>(a: A): Promise<I[A]>;

@@ -12,7 +12,7 @@ class Container<I extends {[P in keyof I]: I[P]}> {
    private inited = false;
    private definitions: { [name: string]: Definition<I> } = {};
 
-   register<N extends keyof I>(moduleName: N) {
+   register = <N extends keyof I>(moduleName: N) => {
       const builder = this.createDeclarationBuilder(moduleName);
       const definition = this.createDefinition(moduleName);
 
